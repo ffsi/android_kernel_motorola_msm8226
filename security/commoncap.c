@@ -31,7 +31,7 @@
 #include <linux/binfmts.h>
 #include <linux/personality.h>
 
-#if defined(CONFIG_ANDROID_PARANOID_NETWORK) || \
+#if defined(CONFIG_SECURITY_ANDROID_GID_CAPABILITIES) || \
 		defined(CONFIG_ANDROID_CAP_SYSLOG_GROUP)
 #include <linux/android_aid.h>
 #endif
@@ -81,7 +81,7 @@ int cap_netlink_send(struct sock *sk, struct sk_buff *skb)
 int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
 		int cap, int audit)
 {
-#ifdef CONFIG_ANDROID_PARANOID_NETWORK
+#ifdef CONFIG_SECURITY_ANDROID_GID_CAPABILITIES
 	if (cap == CAP_NET_RAW && in_egroup_p(AID_NET_RAW))
 		return 0;
 	if (cap == CAP_NET_ADMIN && in_egroup_p(AID_NET_ADMIN))
