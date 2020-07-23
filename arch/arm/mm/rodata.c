@@ -88,7 +88,7 @@ static int set_page_attributes(unsigned long virt, int numpages,
 		pmd_end = min(ALIGN(virt + 1, PMD_SIZE), end);
 
 		if ((pmd_val(*pmd) & PMD_TYPE_MASK) != PMD_TYPE_TABLE) {
-			pr_err("%s: pmd %p=%08lx for %08lx not page table\n",
+			pr_err("%s: pmd %p=%08x for %08lx not page table\n",
 				__func__, pmd, pmd_val(*pmd), virt);
 			virt = pmd_end;
 			continue;
@@ -106,17 +106,6 @@ static int set_page_attributes(unsigned long virt, int numpages,
 	return 0;
 }
 
-int set_memory_ro(unsigned long virt, int numpages)
-{
-	return set_page_attributes(virt, numpages, pte_wrprotect);
-}
-EXPORT_SYMBOL(set_memory_ro);
-
-int set_memory_rw(unsigned long virt, int numpages)
-{
-	return set_page_attributes(virt, numpages, pte_mkwrite);
-}
-EXPORT_SYMBOL(set_memory_rw);
 
 void set_kernel_text_rw(void)
 {
@@ -129,7 +118,7 @@ void set_kernel_text_rw(void)
 	pr_debug("Set kernel text: %lx - %lx to read-write\n",
 		 start, start + size);
 
-	set_memory_rw(start, size >> PAGE_SHIFT);
+	set_page_attributes(start, size >> PAGE_SHIFT, pte_mkwrite);
 }
 
 void set_kernel_text_ro(void)
@@ -146,7 +135,7 @@ void set_kernel_text_ro(void)
 	pr_debug("Set kernel text: %lx - %lx to read only\n",
 		 start, start + size);
 
-	set_memory_ro(start, size >> PAGE_SHIFT);
+	set_page_attributes(start, size >> PAGE_SHIFT, pte_wrprotect);
 }
 
 void mark_rodata_ro(void)
