@@ -105,8 +105,19 @@ static int set_page_attributes(unsigned long virt, int numpages,
 
 	return 0;
 }
+/*
+int set_memory_ro(unsigned long virt, int numpages)
+{
+	return set_page_attributes(virt, numpages, pte_wrprotect);
+}
+EXPORT_SYMBOL(set_memory_ro);
 
-
+int set_memory_rw(unsigned long virt, int numpages)
+{
+	return set_page_attributes(virt, numpages, pte_mkwrite);
+}
+EXPORT_SYMBOL(set_memory_rw);
+*/
 void set_kernel_text_rw(void)
 {
 	unsigned long start = PAGE_ALIGN((unsigned long)_text);
@@ -118,6 +129,7 @@ void set_kernel_text_rw(void)
 	pr_debug("Set kernel text: %lx - %lx to read-write\n",
 		 start, start + size);
 
+	//set_memory_rw(start, size >> PAGE_SHIFT);
 	set_page_attributes(start, size >> PAGE_SHIFT, pte_mkwrite);
 }
 
@@ -135,6 +147,7 @@ void set_kernel_text_ro(void)
 	pr_debug("Set kernel text: %lx - %lx to read only\n",
 		 start, start + size);
 
+	//set_memory_ro(start, size >> PAGE_SHIFT);
 	set_page_attributes(start, size >> PAGE_SHIFT, pte_wrprotect);
 }
 
